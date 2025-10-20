@@ -207,7 +207,7 @@ def friends_list_page(friends):
                 (() => {{
                     const steamid = '{friend["player"]['steamid']}';
                     const index = selectedFriends.indexOf(steamid);
-                    const checkbox = $el.querySelector('input[value="' + steamid + '"]');
+                    const checkbox = document.getElementById('checkbox-{friend["player"]['steamid']}');
                     if (index === -1) {{
                         selectedFriends.push(steamid);
                         if (checkbox) checkbox.checked = true;
@@ -219,6 +219,13 @@ def friends_list_page(friends):
             """
             },
         )[
+            h.input(
+                type="checkbox",
+                name="selected_friends",
+                id=f"checkbox-{friend['player']['steamid']}",
+                value=friend["player"]["steamid"],
+                style="position: absolute; opacity: 0; width: 0; height: 0;",
+            ),
             h.img(
                 ".friend-avatar",
                 src=friend["player"]["avatar"],
@@ -237,12 +244,6 @@ def friends_list_page(friends):
                     }
                 )["✓"]
             ],
-            h.input_(
-                type="checkbox",
-                name="selected_friends",
-                value=friend["player"]["steamid"],
-                style="display: none;",
-            ),
         ]
         for friend in friends
     ]
@@ -258,11 +259,13 @@ def friends_list_page(friends):
                 "Choose the friends you want to find common games with"
             ],
             h.form(
+                id="friends-form",
                 method="POST",
                 action=url_for("select_games"),
                 **{
                     "hx-post": url_for("select_games"),
-                    "hx-target": "#content-area",
+                    "hx-swap": "innerHTML",
+                    "hx-target": "#main-content",
                     "hx-indicator": "#submit-spinner",
                 },
             )[
