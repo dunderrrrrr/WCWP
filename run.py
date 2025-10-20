@@ -5,7 +5,13 @@ import os
 import htpy as h
 from dotenv import load_dotenv
 from steam_web_api import Steam
-from components import base_layout, friends_list_page, games_page
+from components import (
+    base_layout,
+    friends_list_page,
+    friends_list_wrapper,
+    games_page,
+    loading_spinner,
+)
 from flask_caching import Cache
 
 load_dotenv()
@@ -110,6 +116,26 @@ def index():
 
     if not steam_id:
         return str(login_page())
+
+    # Return loading page with HTMX trigger
+    content = h.div(
+        id="content-area",
+        **{
+            "hx-get": url_for("load_friends"),
+            "hx-trigger": "load",
+            "hx-swap": "innerHTML",
+        },
+    )[loading_spinner("Loading your friends...")]
+
+    return str(base_layout(content))
+
+
+@app.route("/load-friends")
+def load_friends():
+    """HTMX endpoint to load friends"""
+    steam_id = session.get("steam_id")
+    if not steam_id:
+        return redirect(url_for("index"))
 
     friends = get_steam_friends(steam_id)
     return str(friends_list_page(friends))

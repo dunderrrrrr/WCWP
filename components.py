@@ -145,12 +145,30 @@ def base_layout(content, container_width="800px"):
                     text-align: center;
                     padding: 2rem;
                 }}
+                .spinner {{
+                    display: inline-block;
+                    width: 40px;
+                    height: 40px;
+                    border: 4px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    border-top-color: var(--pico-primary);
+                    animation: spin 1s ease-in-out infinite;
+                }}
+                @keyframes spin {{
+                    to {{ transform: rotate(360deg); }}
+                }}
+                .htmx-request .htmx-indicator {{
+                    display: inline-block;
+                }}
+                .htmx-indicator {{
+                    display: none;
+                }}
             """
             ],
         ],
         h.body[
             h.div(".container")[
-                h.main[
+                h.main(id="main-content")[
                     h.div(".logo")["WCWP"],
                     h.h1["🎮 What Can We Play"],
                     content,
@@ -169,6 +187,14 @@ def _friend_status_emoji(state):
         return "⚫ Offline"
 
 
+def loading_spinner(message="Loading..."):
+    """Loading spinner component"""
+    return h.div(".loading")[
+        h.div(".spinner"),
+        h.p(style="margin-top: 1rem;")[message],
+    ]
+
+
 def friends_list_page(friends):
     friend_items = [
         h.div(
@@ -176,7 +202,22 @@ def friends_list_page(friends):
             **{
                 ":class": f"{{'selected': selectedFriends.includes('{friend["player"]['steamid']}')}}"
             },
-            **{"@click": f"toggleFriend('{friend["player"]['steamid']}')"},
+            **{
+                "@click": f"""
+                (() => {{
+                    const steamid = '{friend["player"]['steamid']}';
+                    const index = selectedFriends.indexOf(steamid);
+                    const checkbox = $el.querySelector('input[value="' + steamid + '"]');
+                    if (index === -1) {{
+                        selectedFriends.push(steamid);
+                        if (checkbox) checkbox.checked = true;
+                    }} else {{
+                        selectedFriends.splice(index, 1);
+                        if (checkbox) checkbox.checked = false;
+                    }}
+                }})()
+            """
+            },
         )[
             h.img(
                 ".friend-avatar",
@@ -200,9 +241,6 @@ def friends_list_page(friends):
                 type="checkbox",
                 name="selected_friends",
                 value=friend["player"]["steamid"],
-                **{
-                    ":checked": f"selectedFriends.includes('{friend["player"]['steamid']}')"
-                },
                 style="display: none;",
             ),
         ]
@@ -210,12 +248,24 @@ def friends_list_page(friends):
     ]
 
     content = h.div[
-        h.div(**{"x-data": "friendSelector()"})[
+        h.div(
+            **{
+                "x-data": "{ selectedFriends: [], get selectedCount() { return this.selectedFriends.length; } }"
+            }
+        )[
             h.h3["Select Friends to Play With"],
             h.p(style="color: var(--pico-muted-color); margin-bottom: 1rem;")[
                 "Choose the friends you want to find common games with"
             ],
-            h.form(method="POST", action=url_for("select_games"))[
+            h.form(
+                method="POST",
+                action=url_for("select_games"),
+                **{
+                    "hx-post": url_for("select_games"),
+                    "hx-target": "#content-area",
+                    "hx-indicator": "#submit-spinner",
+                },
+            )[
                 h.div(".friends-list")[friend_items],
                 h.div(".selected-count")[
                     h.span(
@@ -228,7 +278,14 @@ def friends_list_page(friends):
                     ".next-btn",
                     type="submit",
                     **{":disabled": "selectedCount === 0"},
-                )["Next: Find Common Games →"],
+                )[
+                    h.span["Next: Find Common Games →"],
+                    h.span(
+                        ".htmx-indicator",
+                        id="submit-spinner",
+                        style="margin-left: 0.5rem;",
+                    )[h.div(".spinner", style="width: 20px; height: 20px;")],
+                ],
             ],
         ],
         h.a(
@@ -237,42 +294,30 @@ def friends_list_page(friends):
             role="button",
             style="margin-top: 1rem; width: 100%;",
         )["Logout"],
-        h.script[
-            """
-            function friendSelector() {
-                return {
-                    selectedFriends: [],
-                    get selectedCount() {
-                        return this.selectedFriends.length;
-                    },
-                    toggleFriend(steamid) {
-                        const index = this.selectedFriends.indexOf(steamid);
-                        if (index === -1) {
-                            this.selectedFriends.push(steamid);
-                        } else {
-                            this.selectedFriends.splice(index, 1);
-                        }
-                    }
-                }
-            }
-        """
-        ],
     ]
 
-    return base_layout(content)
+    return content
+
+
+def friends_list_wrapper(friends):
+    """Wrapper that returns full page layout"""
+    return base_layout(friends_list_page(friends))
 
 
 def games_page(count):
-    return base_layout(
-        h.div[
-            h.p(style="text-align: center;")[f"You selected {count} friend(s)!"],
-            h.p(
-                style="text-align: center; color: var(--pico-muted-color); margin-top: 1rem;"
-            )["This is where we'll show the games you all have in common."],
-            h.a(
-                href=url_for("index"),
-                role="button",
-                style="margin-top: 2rem; width: 100%;",
-            )["← Back to Friends"],
-        ]
-    )
+    content = h.div[
+        h.p(style="text-align: center;")[f"You selected {count} friend(s)!"],
+        h.p(
+            style="text-align: center; color: var(--pico-muted-color); margin-top: 1rem;"
+        )["This is where we'll show the games you all have in common."],
+        h.a(
+            href=url_for("index"),
+            role="button",
+            style="margin-top: 2rem; width: 100%;",
+            **{
+                "hx-get": url_for("load_friends"),
+                "hx-target": "#content-area",
+            },
+        )["← Back to Friends"],
+    ]
+    return content
