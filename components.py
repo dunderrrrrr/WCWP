@@ -307,20 +307,93 @@ def friends_list_wrapper(friends):
     return base_layout(friends_list_page(friends))
 
 
-def games_page(count):
-    content = h.div[
+def games_page(friend_steam_ids: list[str]) -> h.Element:
+    count = len(friend_steam_ids)
+
+    # Convert list to comma-separated string for URL parameter
+    friend_ids_param = ",".join(friend_steam_ids)
+
+    content = h.div("#content-area")[
         h.p(style="text-align: center;")[f"You selected {count} friend(s)!"],
-        h.p(
-            style="text-align: center; color: var(--pico-muted-color); margin-top: 1rem;"
-        )["This is where we'll show the games you all have in common."],
+        h.div(
+            id="games-list",
+            **{
+                "hx-get": url_for("load_common_games", friend_ids=friend_ids_param),
+                "hx-trigger": "load",
+                "hx-swap": "innerHTML",
+            },
+        )[loading_spinner("Finding common games...")],
         h.a(
             href=url_for("index"),
             role="button",
             style="margin-top: 2rem; width: 100%;",
             **{
                 "hx-get": url_for("load_friends"),
-                "hx-target": "#content-area",
+                "hx-target": "#main-content",
             },
         )["← Back to Friends"],
     ]
     return content
+
+
+def common_games_list(games_with_counts, total_users):
+    """Display the list of games ranked by how many people own them"""
+    if not games_with_counts:
+        return h.div(style="text-align: center; padding: 2rem;")[
+            h.p["No common games found. 😢"],
+            h.p(style="color: var(--pico-muted-color); margin-top: 0.5rem;")[
+                "Try selecting different friends!"
+            ],
+        ]
+
+    game_items = [
+        h.div(
+            style="display: flex; align-items: center; padding: 1rem; background: var(--pico-card-background-color); border-radius: 0.5rem; margin-bottom: 0.75rem;"
+        )[
+            (
+                h.img(
+                    src=f"https://media.steampowered.com/steamcommunity/public/images/apps/{game.get('appid')}/{game.get('img_icon_url')}.jpg",
+                    alt=game.get("name", "Unknown"),
+                    style="width: 48px; height: 48px; border-radius: 0.25rem; margin-right: 1rem;",
+                )
+                if game.get("img_icon_url")
+                else h.div(
+                    style="width: 48px; height: 48px; border-radius: 0.25rem; margin-right: 1rem; background: var(--pico-muted-color);"
+                )
+            ),
+            h.div(style="flex: 1;")[
+                h.div(style="font-weight: bold;")[game.get("name", "Unknown Game")],
+                h.div(
+                    style="font-size: 0.875rem; color: var(--pico-muted-color); cursor: help;",
+                    title=", ".join(game.get("owner_names", [])),
+                )[f"{game['owner_count']}/{total_users} people own this"],
+            ],
+            h.div(
+                style=f"""
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 50%;
+                    background: {'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' if game['owner_count'] == total_users else 'rgba(255, 255, 255, 0.1)'};
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                    font-size: 0.875rem;
+                    color: {'white' if game['owner_count'] == total_users else 'rgba(255, 255, 255, 0.6)'};
+                """
+            )[f"{int(game['owner_count'] / total_users * 100)}%"],
+        ]
+        for game in games_with_counts
+    ]
+
+    return h.div[
+        h.h3(style="margin-top: 2rem;")[
+            f"Found {len(games_with_counts)} game{'' if len(games_with_counts) == 1 else 's'}! 🎮"
+        ],
+        h.p(style="color: var(--pico-muted-color); margin-bottom: 1rem;")[
+            "Games ranked by how many people own them"
+        ],
+        h.div(style="max-height: 400px; overflow-y: auto; margin-top: 1rem;")[
+            game_items
+        ],
+    ]

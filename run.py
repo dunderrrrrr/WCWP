@@ -1,18 +1,21 @@
-from flask import Flask, redirect, url_for, session, request
-import httpx
-import re
 import os
+import re
+
 import htpy as h
+import httpx
 from dotenv import load_dotenv
+from flask import Flask, redirect, request, session, url_for
+from flask_caching import Cache
 from steam_web_api import Steam
+
 from components import (
     base_layout,
+    common_games_list,
     friends_list_page,
     friends_list_wrapper,
     games_page,
     loading_spinner,
 )
-from flask_caching import Cache
 
 load_dotenv()
 
@@ -168,8 +171,77 @@ def logout():
 @app.route("/select-games", methods=["POST"])
 def select_games():
     selected_friends = request.form.getlist("selected_friends")
-    session["selected_friends"] = selected_friends
-    return str(games_page(len(selected_friends)))
+    return str(games_page(selected_friends))
+
+
+@app.route("/load-common-games")
+def load_common_games():
+    """HTMX endpoint to load common games"""
+    friend_ids_str = request.args.get("friend_ids", "")
+    if not friend_ids_str:
+        return str(h.p["No friends selected."])
+
+    friend_ids = friend_ids_str.split(",")
+
+    # Get the current user's steam ID
+    steam_id = session.get("steam_id")
+    if not steam_id:
+        return redirect(url_for("index"))
+
+    # Include the current user in the list
+    all_user_ids = [steam_id] + friend_ids
+    total_users = len(all_user_ids)
+
+    try:
+        # Get games for each user
+        user_games = {}
+        all_games = {}  # Track all unique games and their details
+
+        for user_id in all_user_ids:
+            games = steam.users.get_owned_games(user_id)
+            if games and "games" in games:
+                user_games[user_id] = set()
+                for game in games["games"]:
+                    appid = game["appid"]
+                    user_games[user_id].add(appid)
+                    # Store game details (use first occurrence)
+                    if appid not in all_games:
+                        all_games[appid] = game
+            else:
+                user_games[user_id] = set()
+
+        # Count how many users own each game
+        game_owner_counts = {}
+        for appid in all_games.keys():
+            count = sum(
+                1 for user_game_set in user_games.values() if appid in user_game_set
+            )
+            game_owner_counts[appid] = count
+
+        min_owners = max(2, int(total_users * 0.5))
+
+        common_games = []
+        for appid, count in game_owner_counts.items():
+            if count >= min_owners:
+                game_info = all_games[appid].copy()
+                game_info["owner_count"] = count
+                common_games.append(game_info)
+
+        # Sort by owner count (descending), then by name
+        common_games.sort(key=lambda x: (-x["owner_count"], x.get("name", "").lower()))
+
+        return str(common_games_list(common_games, total_users))
+
+    except Exception as e:
+        print(f"Error fetching common games: {e}")
+        import traceback
+
+        traceback.print_exc()
+        return str(
+            h.div(style="text-align: center; padding: 2rem;")[
+                h.p["Error loading games. Please try again."],
+            ]
+        )
 
 
 if __name__ == "__main__":

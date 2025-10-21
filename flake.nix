@@ -23,6 +23,9 @@
             pkgs.uv
             pkgs.ruff
             python
+            (pkgs.writeShellScriptBin "run-server" ''
+              python run.py
+            '')             
           ];
           shellHook = ''
             uv venv
