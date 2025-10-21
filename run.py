@@ -138,7 +138,7 @@ def load_friends():
     friends = get_steam_friends(steam_id)
 
     if friends == UNAUTHORIZED:
-        cache.clear()
+        cache.delete_memoized(get_steam_friends, steam_id)
         return str(private_profile_message())
 
     return str(friends_list_page(friends))
