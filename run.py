@@ -25,20 +25,11 @@ sentry_sdk.init(dsn=os.getenv("SENTRY_DSN"), send_default_pii=True)
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
-STEAM_API_KEY = os.getenv("STEAM_API_KEY")
+cache = Cache(app)
 
+STEAM_API_KEY = os.getenv("STEAM_API_KEY")
 STEAM_OPENID_URL = "https://steamcommunity.com/openid/login"
 STEAM_API_URL = "http://api.steampowered.com/ISteamUser"
-
-
-# Configure cache
-cache = Cache(
-    app,
-    config={
-        "CACHE_TYPE": "SimpleCache",
-        "CACHE_DEFAULT_TIMEOUT": 300,
-    },
-)
 
 
 steam = Steam(STEAM_API_KEY)
@@ -82,9 +73,8 @@ def validate_steam_login():
 UNAUTHORIZED = 401
 
 
-@cache.memoize(timeout=900)
+@cache.cached(timeout=900)
 def get_steam_friends(steam_id):
-    """Get Steam friends list with full details"""
     try:
         response = httpx.get(
             f"http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key={STEAM_API_KEY}&steamid={steam_id}&relationship=friend"
