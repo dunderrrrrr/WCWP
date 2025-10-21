@@ -378,7 +378,7 @@ def common_games_list(games_with_counts, total_users):
                 h.div(".game-owner-count")[
                     f"{game['owner_count']}/{total_users} people own this"
                 ],
-                h.div(".owner-badges")[
+                h.div(".owner-badges", **{"x-show": "showOwners"})[
                     (h.span(".owner-badge")[name] for name in game["owner_names"])
                 ],
             ],
@@ -389,12 +389,23 @@ def common_games_list(games_with_counts, total_users):
         for game in games_with_counts
     ]
 
-    return h.div[
+    return h.div(**{"x-data": "{ showOwners: false }"})[
         h.h3(".games-header")[
-            f"Found {len(games_with_counts)} game{'' if len(games_with_counts) == 1 else 's'}! 🎮"
+            f"Found {len(games_with_counts)} game{'' if len(games_with_counts) == 1 else 's'}!"
         ],
-        h.p(".games-description")[
-            "Games ranked by how many people own them (hover to see who)"
+        h.div(".games-controls")[
+            h.p(".games-description")["Games ranked by how many people own them"],
+            h.label(".toggle-owners-switch")[
+                h.input(
+                    type="checkbox",
+                    role="switch",
+                    **{"x-model": "showOwners", ":checked": "showOwners"},
+                ),
+                h.span(".switch-label")[
+                    h.span(**{"x-show": "!showOwners"})["Show players"],
+                    h.span(**{"x-show": "showOwners"})["Hide players"],
+                ],
+            ],
         ],
         h.div(".games-container")[game_items],
     ]
