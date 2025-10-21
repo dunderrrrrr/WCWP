@@ -39,6 +39,8 @@ def base_layout(content, container_width="800px"):
                     max-width: {container_width};
                     width: 100%;
                     transition: max-width 0.3s;
+                    height: 100%;
+                    max-height: calc(100vh - 4rem);
                 }}
                 main {{
                     background: var(--pico-background-color);
@@ -81,7 +83,7 @@ def base_layout(content, container_width="800px"):
                 .friends-list {{
                     max-height: 400px;
                     overflow-y: auto;
-                    margin: 1.5rem 0;
+                    margin: 0;
                 }}
                 .friend-item {{
                     display: flex;
