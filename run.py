@@ -12,9 +12,9 @@ from components import (
     base_layout,
     common_games_list,
     friends_list_page,
-    friends_list_wrapper,
     games_page,
     loading_spinner,
+    login_page,
 )
 
 load_dotenv()
@@ -38,19 +38,6 @@ cache = Cache(
 
 
 steam = Steam(STEAM_API_KEY)
-
-
-def login_page():
-    """Login page content"""
-    return base_layout(
-        h.div[
-            h.p(style="text-align: center; margin-bottom: 1.5rem;")[
-                "Sign in with your Steam account to find games you can play with your friends"
-            ],
-            h.a(".steam-btn", href=url_for("login"))["Sign in through Steam"],
-        ],
-        container_width="500px",
-    )
 
 
 def get_steam_login_url():

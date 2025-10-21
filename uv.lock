@@ -177,15 +177,6 @@ wheels = [
 ]
 
 [[package]]
-name = "defusedxml"
-version = "0.7.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/0f/d5/c66da9b79e5bdb124974bfe172b4daf3c984ebd9c2a06e2b8a4dc7331c72/defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69", size = 75520, upload-time = "2021-03-08T10:59:26.269Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/07/6c/aa3f2f849e01cb6a001cd8554a88d4c77c5c1a31c95bdf1cf9301e6d9ef4/defusedxml-0.7.1-py2.py3-none-any.whl", hash = "sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61", size = 25604, upload-time = "2021-03-08T10:59:24.45Z" },
-]
-
-[[package]]
 name = "distlib"
 version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -243,19 +234,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/e2/80/74846c8af58ed60972d64f23a6cd0c3ac0175677d7555dff9f51bf82c294/flask_caching-2.3.1.tar.gz", hash = "sha256:65d7fd1b4eebf810f844de7de6258254b3248296ee429bdcb3f741bcbf7b98c9", size = 67560, upload-time = "2025-02-23T01:34:40.207Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/00/bb/82daa5e2fcecafadcc8659ce5779679d0641666f9252a4d5a2ae987b0506/Flask_Caching-2.3.1-py3-none-any.whl", hash = "sha256:d3efcf600e5925ea5a2fcb810f13b341ae984f5b52c00e9d9070392f3ca10761", size = 28916, upload-time = "2025-02-23T01:34:37.749Z" },
-]
-
-[[package]]
-name = "flask-openid"
-version = "1.3.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "flask" },
-    { name = "python3-openid" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/69/c1/58cf6947fc8b0a92085df8be085960e70200b50606ff62673ef83127d609/flask_openid-1.3.1.tar.gz", hash = "sha256:27628bc0a37e6530948823193e068d79035ad9496d87b74040443ec484c7657a", size = 36711, upload-time = "2024-05-26T15:49:12.575Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/98/b2/65517080f52cec9be6eaf53a89da45aa0ffb09256833af63a9d8cd1ed807/Flask_OpenID-1.3.1-py3-none-any.whl", hash = "sha256:be65ab20c639841bbf0602684b278be8cfbbccbc39558da06b6d127470753fc4", size = 9392, upload-time = "2024-05-26T15:49:11.206Z" },
 ]
 
 [[package]]
@@ -606,18 +584,6 @@ wheels = [
 ]
 
 [[package]]
-name = "python3-openid"
-version = "3.2.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "defusedxml" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/5f/4a/29feb8da6c44f77007dcd29518fea73a3d5653ee02a587ae1f17f1f5ddb5/python3-openid-3.2.0.tar.gz", hash = "sha256:33fbf6928f401e0b790151ed2b5290b02545e8775f982485205a066f874aaeaf", size = 305600, upload-time = "2020-06-29T12:15:49.026Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e0/a5/c6ba13860bdf5525f1ab01e01cc667578d6f1efc8a1dba355700fb04c29b/python3_openid-3.2.0-py3-none-any.whl", hash = "sha256:6626f771e0417486701e0b4daff762e7212e820ca5b29fcc0d05f6f8736dfa6b", size = 133681, upload-time = "2020-06-29T12:15:47.502Z" },
-]
-
-[[package]]
 name = "pyyaml"
 version = "6.0.3"
 source = { registry = "https://pypi.org/simple" }
@@ -815,7 +781,6 @@ source = { virtual = "." }
 dependencies = [
     { name = "flask" },
     { name = "flask-caching" },
-    { name = "flask-openid" },
     { name = "htpy" },
     { name = "httpx" },
     { name = "mypy" },
@@ -823,14 +788,12 @@ dependencies = [
     { name = "pytest" },
     { name = "python-dotenv" },
     { name = "python-steam-api" },
-    { name = "python3-openid" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "flask", specifier = ">=3.1.2" },
     { name = "flask-caching", specifier = ">=2.3.1" },
-    { name = "flask-openid", specifier = ">=1.3.1" },
     { name = "htpy", specifier = ">=25.10.0" },
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "mypy", specifier = ">=1.15.0" },
@@ -838,5 +801,4 @@ requires-dist = [
     { name = "pytest", specifier = ">=8.2.2" },
     { name = "python-dotenv", specifier = ">=1.1.1" },
     { name = "python-steam-api", specifier = ">=2.2.1" },
-    { name = "python3-openid", specifier = ">=3.2.0" },
 ]

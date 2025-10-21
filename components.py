@@ -178,13 +178,17 @@ def base_layout(content, container_width="800px"):
     ]
 
 
-def _friend_status_emoji(state):
-    if state == 1:
-        return "🟢 Online"
-    elif state == 3:
-        return "🟠 Away"
-    else:
-        return "⚫ Offline"
+def login_page():
+    """Login page content"""
+    return base_layout(
+        h.div[
+            h.p(style="text-align: center; margin-bottom: 1.5rem;")[
+                "Sign in with your Steam account to find games you can play with your friends"
+            ],
+            h.a(".steam-btn", href=url_for("login"))["Sign in through Steam"],
+        ],
+        container_width="500px",
+    )
 
 
 def loading_spinner(message="Loading..."):
@@ -233,9 +237,6 @@ def friends_list_page(friends):
             ),
             h.div(".friend-info")[
                 h.div(".friend-name")[friend["player"]["personaname"]],
-                h.div(".friend-status")[
-                    _friend_status_emoji(friend.get("personastate", 0))
-                ],
             ],
             h.div(".checkbox-icon")[
                 h.span(
@@ -245,7 +246,7 @@ def friends_list_page(friends):
                 )["✓"]
             ],
         ]
-        for friend in friends
+        for friend in sorted(friends, key=lambda x: x["player"]["personaname"])
     ]
 
     content = h.div[
@@ -308,13 +309,9 @@ def friends_list_wrapper(friends):
 
 
 def games_page(friend_steam_ids: list[str]) -> h.Element:
-    count = len(friend_steam_ids)
-
-    # Convert list to comma-separated string for URL parameter
     friend_ids_param = ",".join(friend_steam_ids)
 
     content = h.div("#content-area")[
-        h.p(style="text-align: center;")[f"You selected {count} friend(s)!"],
         h.div(
             id="games-list",
             **{
@@ -364,7 +361,7 @@ def common_games_list(games_with_counts, total_users):
             h.div(style="flex: 1;")[
                 h.div(style="font-weight: bold;")[game.get("name", "Unknown Game")],
                 h.div(
-                    style="font-size: 0.875rem; color: var(--pico-muted-color); cursor: help;",
+                    style="font-size: 0.875rem; color: var(--pico-muted-color)",
                     title=", ".join(game.get("owner_names", [])),
                 )[f"{game['owner_count']}/{total_users} people own this"],
             ],
