@@ -275,7 +275,7 @@ def friends_list_page(friends, user_name=None):
                 **{
                     "hx-post": url_for("select_games"),
                     "hx-swap": "innerHTML",
-                    "hx-target": "#main-content",
+                    "hx-target": "#content-area",
                     "hx-indicator": "#submit-spinner",
                 },
             )[
@@ -339,7 +339,7 @@ def friends_list_page(friends, user_name=None):
 def games_page(friend_steam_ids: list[str]) -> h.Element:
     friend_ids_param = ",".join(friend_steam_ids)
 
-    content = h.div("#content-area")[
+    content = h.div[
         h.div(
             id="games-list",
             **{
@@ -354,7 +354,7 @@ def games_page(friend_steam_ids: list[str]) -> h.Element:
             role="button",
             **{
                 "hx-get": url_for("load_friends"),
-                "hx-target": "#main-content",
+                "hx-target": "#content-area",
             },
         )["← Back to Friends"],
     ]
