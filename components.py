@@ -272,12 +272,10 @@ def friends_list_page(friends, user_name=None):
                 id="friends-form",
                 method="POST",
                 action=url_for("select_games"),
-                **{
-                    "hx-post": url_for("select_games"),
-                    "hx-swap": "innerHTML",
-                    "hx-target": "#content-area",
-                    "hx-indicator": "#submit-spinner",
-                },
+                hx_post=url_for("select_games"),
+                hx_swap="innerHTML",
+                hx_target="#content-area",
+                hx_indicator="#submit-spinner",
             )[
                 h.div(".friends-list")[friend_items],
                 h.div(".selected-count")[
@@ -342,27 +340,22 @@ def games_page(friend_steam_ids: list[str]) -> h.Element:
     content = h.div[
         h.div(
             id="games-list",
-            **{
-                "hx-get": url_for("load_common_games", friend_ids=friend_ids_param),
-                "hx-trigger": "load",
-                "hx-swap": "innerHTML",
-            },
+            hx_get=url_for("load_common_games", friend_ids=friend_ids_param),
+            hx_trigger="load",
+            hx_swap="innerHTML",
         )[loading_spinner("Finding common games...")],
         h.a(
             ".back-button",
             href=url_for("index"),
             role="button",
-            **{
-                "hx-get": url_for("load_friends"),
-                "hx-target": "#content-area",
-            },
+            hx_get=url_for("load_friends"),
+            hx_target="#content-area",
         )["← Back to Friends"],
     ]
     return content
 
 
 def common_games_list(games_with_counts, total_users):
-    """Display the list of games ranked by how many people own them"""
     if not games_with_counts:
         return h.div(".no-games-message")[
             h.p["No common games found. 😢"],
@@ -408,7 +401,6 @@ def common_games_list(games_with_counts, total_users):
 
 
 def private_profile_message() -> h.Element:
-    """Message shown when user's profile is private"""
     return h.div(".private-profile-container")[
         h.div(".private-profile-icon")["🔒"],
         h.h2(".private-profile-title")["Your Profile is Private"],
