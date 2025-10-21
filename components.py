@@ -134,13 +134,6 @@ def friends_list_page(friends, user_name=None):
             h.div(".friend-info")[
                 h.div(".friend-name")[friend["player"]["personaname"]],
             ],
-            h.div(".checkbox-icon")[
-                h.span(
-                    **{
-                        "x-show": f"selectedFriends.includes('{friend['player']['steamid']}')"
-                    }
-                )["✓"]
-            ],
         ]
         for friend in sorted(friends, key=lambda x: x["player"]["personaname"])
     ]

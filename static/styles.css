@@ -300,22 +300,24 @@ h1 {
 .friend-item {
     display: flex;
     align-items: center;
-    padding: 1rem;
+    padding: 0.75rem;
     background: var(--pico-card-background-color);
     border-radius: 0.5rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     cursor: pointer;
     transition: all 0.3s;
     border: 2px solid transparent;
 }
 
 .friend-item:hover {
-    background: var(--pico-secondary-background);
+    background: rgba(102, 126, 234, 0.05);
+    border-color: rgba(102, 126, 234, 0.2);
 }
 
 .friend-item.selected {
-    border-color: var(--pico-primary);
-    background: var(--pico-primary-background);
+    border-color: rgba(102, 126, 234, 0.6);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
 }
 
 .friend-avatar {
@@ -649,6 +651,16 @@ h1 {
     color: rgba(255, 255, 255, 0.7);
 }
 
+@media (max-width: 600px) {
+    .save-group-form {
+        flex-direction: column;
+    }
+
+    .save-group-form button {
+        width: 100%;
+    }
+}
+
 /* Additional component styles */
 .intro-text {
     text-align: center;
@@ -690,6 +702,8 @@ h1 {
     color: var(--pico-primary);
     cursor: pointer;
     text-decoration: underline;
+    font-size: 0.8rem;
+    white-space: nowrap;
 }
 
 .loading-message {
@@ -715,6 +729,19 @@ h1 {
 .back-button {
     margin-top: 2rem;
     width: 100%;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+    font-size: 0.875rem;
+    padding: 0.6rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .logout-button {
