@@ -210,6 +210,50 @@ def base_layout(content, container_width="800px"):
                     opacity: 1 !important;
                     max-height: 100px !important;
                 }}
+                .groups-section {{
+                    margin-bottom: 1.5rem;
+                    padding: 1rem;
+                    background: var(--pico-card-background-color);
+                    border-radius: 0.5rem;
+                }}
+                .group-select-container {{
+                    display: flex;
+                    gap: 0.5rem;
+                    align-items: center;
+                }}
+                .group-select-container select {{
+                    flex: 1;
+                    margin: 0;
+                }}
+                .group-select-container button {{
+                    margin: 0;
+                    padding: 0.5rem 0.75rem;
+                    background: transparent;
+                    border: 1px solid var(--pico-del-color);
+                    color: var(--pico-del-color);
+                }}
+                .group-select-container button:hover {{
+                    background: var(--pico-del-color);
+                    color: white;
+                }}
+                .save-group-btn {{
+                    margin-bottom: 1rem;
+                    padding: 0.5rem 1rem;
+                    font-size: 0.875rem;
+                }}
+                .save-group-form {{
+                    display: flex;
+                    gap: 0.5rem;
+                    margin-top: 0.75rem;
+                }}
+                .save-group-form input {{
+                    flex: 1;
+                    margin: 0;
+                }}
+                .save-group-form button {{
+                    margin: 0;
+                    white-space: nowrap;
+                }}
             """
             ],
         ],
@@ -302,24 +346,138 @@ def friends_list_page(friends):
     content = h.div[
         h.div(
             **{
-                "x-data": "{ selectedFriends: [], searchQuery: '', get selectedCount() { return this.selectedFriends.length; } }"
+                "x-data": """{
+                    selectedFriends: [],
+                    searchQuery: '',
+                    groups: JSON.parse(localStorage.getItem('friendGroups') || '[]'),
+                    showSaveForm: false,
+                    newGroupName: '',
+                    selectedGroupIndex: '',
+                    loadedGroupFriends: [],
+                    get selectedCount() { return this.selectedFriends.length; },
+                    get hasChangesFromGroup() {
+                        if (this.selectedGroupIndex === '' || this.loadedGroupFriends.length === 0) return true;
+                        if (this.selectedFriends.length !== this.loadedGroupFriends.length) return true;
+                        const sortedSelected = [...this.selectedFriends].sort();
+                        const sortedLoaded = [...this.loadedGroupFriends].sort();
+                        return !sortedSelected.every((id, i) => id === sortedLoaded[i]);
+                    },
+                    saveGroup() {
+                        if (this.newGroupName.trim() && this.selectedFriends.length > 0) {
+                            this.groups.push({
+                                name: this.newGroupName.trim(),
+                                steamIds: [...this.selectedFriends]
+                            });
+                            localStorage.setItem('friendGroups', JSON.stringify(this.groups));
+                            this.newGroupName = '';
+                            this.showSaveForm = false;
+                        }
+                    },
+                    loadGroup() {
+                        if (this.selectedGroupIndex !== '') {
+                            const steamIds = this.groups[this.selectedGroupIndex].steamIds;
+                            this.selectedFriends = [...steamIds];
+                            this.loadedGroupFriends = [...steamIds];
+                            this.selectedFriends.forEach(steamid => {
+                                const checkbox = document.getElementById('checkbox-' + steamid);
+                                if (checkbox) checkbox.checked = true;
+                            });
+                        }
+                    },
+                    deleteGroup() {
+                        if (this.selectedGroupIndex !== '' && confirm('Delete this group?')) {
+                            this.groups.splice(this.selectedGroupIndex, 1);
+                            localStorage.setItem('friendGroups', JSON.stringify(this.groups));
+                            this.selectedGroupIndex = '';
+                        }
+                    }
+                }"""
             }
         )[
-            h.h3["Select Friends to Play With"],
             h.p(style="color: var(--pico-muted-color); margin-bottom: 1rem;")[
-                "Choose the friends you want to find common games with"
+                "Choose the friends you want to find common games with."
             ],
-            h.div(".search-bar")[
-                h.input(
-                    type="text",
-                    placeholder="Search friends...",
-                    **{"x-model": "searchQuery"},
-                ),
+            h.div(".groups-section", **{"x-show": "groups.length > 0 || showSaveForm"})[
+                h.div(".group-select-container", **{"x-show": "groups.length > 0"})[
+                    h.select(
+                        **{
+                            "x-model": "selectedGroupIndex",
+                            "@change": "loadGroup()",
+                        }
+                    )[
+                        h.option(value="", selected=True)["Select a group..."],
+                        h.template(
+                            **{"x-for": "(group, index) in groups", ":key": "index"}
+                        )[
+                            h.option(
+                                **{
+                                    ":value": "index",
+                                    "x-text": "group.name + ' (' + group.steamIds.length + ' friends)'",
+                                }
+                            ),
+                        ],
+                    ],
+                    h.button(
+                        type="button",
+                        **{
+                            "@click": "deleteGroup()",
+                            ":disabled": "selectedGroupIndex === ''",
+                            "title": "Delete selected group",
+                        },
+                    )["Delete"],
+                ],
+                # Save group form
+                h.div(**{"x-show": "showSaveForm"})[
+                    h.div(".save-group-form")[
+                        h.input(
+                            type="text",
+                            placeholder="Group name...",
+                            **{
+                                "x-model": "newGroupName",
+                                "@keyup.enter": "saveGroup()",
+                            },
+                        ),
+                        h.button(
+                            type="button",
+                            **{"@click": "saveGroup()"},
+                        )["Save"],
+                        h.button(
+                            ".secondary",
+                            type="button",
+                            **{"@click": "showSaveForm = false; newGroupName = ''"},
+                        )["Cancel"],
+                    ]
+                ],
+            ],
+            # Search bar with Save button
+            h.div(
+                style="display: flex; gap: 0.5rem; margin-bottom: 1rem; align-items: stretch;"
+            )[
+                h.div(".search-bar", style="flex: 1; margin-bottom: 0;")[
+                    h.input(
+                        type="text",
+                        placeholder="Search friends...",
+                        **{"x-model": "searchQuery"},
+                    ),
+                    h.button(
+                        ".clear-search-btn",
+                        type="button",
+                        **{
+                            "@click": "searchQuery = ''",
+                            "x-show": "searchQuery !== ''",
+                        },
+                    )["×"],
+                ],
+                # Save group button (shown when friends are selected)
                 h.button(
-                    ".clear-search-btn",
+                    ".save-group-btn",
                     type="button",
-                    **{"@click": "searchQuery = ''", "x-show": "searchQuery !== ''"},
-                )["×"],
+                    style="white-space: nowrap; margin: 0;",
+                    **{
+                        "x-show": "selectedCount > 0 && !showSaveForm && hasChangesFromGroup",
+                        "@click": "showSaveForm = true",
+                    },
+                )["Save as group"],
             ],
             h.form(
                 id="friends-form",
@@ -338,14 +496,27 @@ def friends_list_page(friends):
                         **{
                             "x-text": "selectedCount === 0 ? 'No friends selected' : selectedCount === 1 ? '1 friend selected' : selectedCount + ' friends selected'"
                         }
-                    )
+                    ),
+                    h.span(
+                        **{"x-show": "selectedCount > 0"},
+                        style="margin-left: 0.5rem;",
+                    )[
+                        h.a(
+                            href="#",
+                            style="color: var(--pico-primary); cursor: pointer; text-decoration: underline;",
+                            **{
+                                "@click.prevent": """selectedFriends = [];
+                                document.querySelectorAll('input[name=selected_friends]').forEach(cb => cb.checked = false);"""
+                            },
+                        )["Clear selection"]
+                    ],
                 ],
                 h.button(
                     ".next-btn",
                     type="submit",
                     **{":disabled": "selectedCount === 0"},
                 )[
-                    h.span["Next: Find Common Games →"],
+                    h.span["Find games →"],
                     h.span(
                         ".htmx-indicator",
                         id="submit-spinner",
