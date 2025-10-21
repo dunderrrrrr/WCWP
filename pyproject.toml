@@ -16,6 +16,7 @@ dependencies = [
     "python-steam-api>=2.2.1",
     "flask-caching>=2.3.1",
     "sentry-sdk[flask]>=2.42.1",
+    "uvicorn>=0.38.0",
 ]
 
 

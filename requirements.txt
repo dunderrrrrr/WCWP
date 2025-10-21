@@ -21,7 +21,9 @@ cfgv==3.4.0
 charset-normalizer==3.4.4
     # via requests
 click==8.3.0
-    # via flask
+    # via
+    #   flask
+    #   uvicorn
 distlib==0.4.0
     # via virtualenv
 filelock==3.20.0
@@ -34,7 +36,9 @@ flask==3.1.2
 flask-caching==2.3.1
     # via what-can-we-play (pyproject.toml)
 h11==0.16.0
-    # via httpcore
+    # via
+    #   httpcore
+    #   uvicorn
 htpy==25.10.0
     # via what-can-we-play (pyproject.toml)
 httpcore==1.0.9
@@ -103,6 +107,8 @@ urllib3==2.5.0
     # via
     #   requests
     #   sentry-sdk
+uvicorn==0.38.0
+    # via what-can-we-play (pyproject.toml)
 virtualenv==20.35.3
     # via pre-commit
 werkzeug==3.1.3
