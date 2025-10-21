@@ -34,8 +34,10 @@ def base_layout(content, container_width="800px"):
         h.body[
             h.div(class_=container_class)[
                 h.main(id="main-content")[
-                    h.div(".logo")["WCWP"],
-                    h.h1["🎮 What Can We Play"],
+                    h.div(".header-container")[
+                        h.div(".logo")["WCWP"],
+                        h.div(".slogan")["what can we play"],
+                    ],
                     content,
                 ]
             ]

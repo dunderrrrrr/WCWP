@@ -25,22 +25,85 @@ main {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
+.header-container {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+.header-container::after {
+    content: '';
+    position: absolute;
+    bottom: -1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #667eea, #764ba2, transparent);
+    border-radius: 2px;
+}
+
 .logo {
     font-family: 'Orbitron', sans-serif;
-    font-size: 2.5rem;
+    font-size: 3.5rem;
     font-weight: 700;
-    text-align: center;
-    margin-bottom: 0.5rem;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    letter-spacing: 4px;
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+}
+
+.slogan {
+    font-size: 1.25rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 1px;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.slogan::before {
+    content: '//';
+    position: absolute;
+    left: 0;
+    color: rgba(102, 126, 234, 0.5);
+    font-weight: 400;
 }
 
 h1 {
     text-align: center;
     margin-bottom: 1.5rem;
     font-size: 1.5rem;
+}
+
+@media (max-width: 600px) {
+    .header-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .logo {
+        font-size: 2.75rem;
+        letter-spacing: 3px;
+    }
+
+    .slogan {
+        padding-left: 0;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .slogan::before {
+        display: none;
+    }
 }
 
 .steam-btn {
