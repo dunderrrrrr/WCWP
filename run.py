@@ -176,7 +176,6 @@ def select_games():
 
 @app.route("/load-common-games")
 def load_common_games():
-    """HTMX endpoint to load common games"""
     friend_ids_str = request.args.get("friend_ids", "")
     if not friend_ids_str:
         return str(h.p["No friends selected."])

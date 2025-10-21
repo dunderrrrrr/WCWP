@@ -141,6 +141,32 @@ def base_layout(content, container_width="800px"):
                     color: var(--pico-muted-color);
                     margin-top: 1rem;
                 }}
+                .search-bar {{
+                    margin-bottom: 1rem;
+                    width: 100%;
+                    position: relative;
+                }}
+                .search-bar input {{
+                    margin-bottom: 0;
+                    padding-right: 3rem;
+                }}
+                .clear-search-btn {{
+                    position: absolute;
+                    right: 0.5rem;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: transparent;
+                    border: none;
+                    color: var(--pico-muted-color);
+                    cursor: pointer;
+                    padding: 0.5rem;
+                    font-size: 1.2rem;
+                    line-height: 1;
+                    transition: color 0.3s;
+                }}
+                .clear-search-btn:hover {{
+                    color: var(--pico-color);
+                }}
                 .loading {{
                     text-align: center;
                     padding: 2rem;
@@ -226,6 +252,9 @@ def friends_list_page(friends):
                 ":class": f"{{'selected': selectedFriends.includes('{friend['player']['steamid']}')}}"
             },
             **{
+                "x-show": f"'{friend['player']['personaname'].lower()}'.includes(searchQuery.toLowerCase())"
+            },
+            **{
                 "@click": f"""
                 (() => {{
                     const steamid = '{friend["player"]["steamid"]}';
@@ -271,12 +300,24 @@ def friends_list_page(friends):
     content = h.div[
         h.div(
             **{
-                "x-data": "{ selectedFriends: [], get selectedCount() { return this.selectedFriends.length; } }"
+                "x-data": "{ selectedFriends: [], searchQuery: '', get selectedCount() { return this.selectedFriends.length; } }"
             }
         )[
             h.h3["Select Friends to Play With"],
             h.p(style="color: var(--pico-muted-color); margin-bottom: 1rem;")[
                 "Choose the friends you want to find common games with"
+            ],
+            h.div(".search-bar")[
+                h.input(
+                    type="text",
+                    placeholder="Search friends...",
+                    **{"x-model": "searchQuery"},
+                ),
+                h.button(
+                    ".clear-search-btn",
+                    type="button",
+                    **{"@click": "searchQuery = ''", "x-show": "searchQuery !== ''"},
+                )["×"],
             ],
             h.form(
                 id="friends-form",
