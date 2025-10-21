@@ -82,7 +82,7 @@ def validate_steam_login():
 UNAUTHORIZED = 401
 
 
-@cache.cached(timeout=900)
+@cache.memoize(timeout=900)
 def get_steam_friends(steam_id):
     try:
         response = httpx.get(
