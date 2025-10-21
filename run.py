@@ -3,6 +3,7 @@ import re
 
 import htpy as h
 import httpx
+import sentry_sdk
 from dotenv import load_dotenv
 from flask import Flask, redirect, request, session, url_for
 from flask_caching import Cache
@@ -15,9 +16,12 @@ from components import (
     games_page,
     loading_spinner,
     login_page,
+    private_profile_message,
 )
 
 load_dotenv()
+
+sentry_sdk.init(dsn=os.getenv("SENTRY_DSN"), send_default_pii=True)
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
@@ -75,18 +79,25 @@ def validate_steam_login():
     return None
 
 
+UNAUTHORIZED = 401
+
+
 @cache.memoize(timeout=900)
 def get_steam_friends(steam_id):
     """Get Steam friends list with full details"""
     try:
-        # Get the friends list
         response = httpx.get(
             f"http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key={STEAM_API_KEY}&steamid={steam_id}&relationship=friend"
         )
 
         data = response.json()
+
         if "friendslist" not in data:
-            return []  # user is probably private
+            if response.status_code == 401 or (
+                isinstance(data, dict) and data.get("error")
+            ):
+                return UNAUTHORIZED
+            return []  # Empty friends list
 
         friend_ids = [friend["steamid"] for friend in data["friendslist"]["friends"]]
 
@@ -107,7 +118,6 @@ def index():
     if not steam_id:
         return str(login_page())
 
-    # Return loading page with HTMX trigger
     content = h.div(
         id="content-area",
         **{
@@ -122,12 +132,16 @@ def index():
 
 @app.route("/load-friends")
 def load_friends():
-    """HTMX endpoint to load friends"""
     steam_id = session.get("steam_id")
     if not steam_id:
         return redirect(url_for("index"))
 
     friends = get_steam_friends(steam_id)
+
+    if friends == UNAUTHORIZED:
+        cache.clear()
+        return str(private_profile_message())
+
     return str(friends_list_page(friends))
 
 
@@ -170,19 +184,25 @@ def load_common_games():
 
     friend_ids = friend_ids_str.split(",")
 
-    # Get the current user's steam ID
     steam_id = session.get("steam_id")
     if not steam_id:
         return redirect(url_for("index"))
 
-    # Include the current user in the list
     all_user_ids = [steam_id] + friend_ids
     total_users = len(all_user_ids)
 
     try:
-        # Get games for each user
+        user_details = {}
+        for user_id in all_user_ids:
+            try:
+                details = steam.users.get_user_details(user_id)
+                user_details[user_id] = details["player"]["personaname"]
+            except Exception:
+                user_details[user_id] = "Unknown User"
+
         user_games = {}
-        all_games = {}  # Track all unique games and their details
+        all_games = {}
+        game_owners = {}
 
         for user_id in all_user_ids:
             games = steam.users.get_owned_games(user_id)
@@ -191,13 +211,14 @@ def load_common_games():
                 for game in games["games"]:
                     appid = game["appid"]
                     user_games[user_id].add(appid)
-                    # Store game details (use first occurrence)
                     if appid not in all_games:
                         all_games[appid] = game
+                    if appid not in game_owners:
+                        game_owners[appid] = []
+                    game_owners[appid].append(user_id)
             else:
                 user_games[user_id] = set()
 
-        # Count how many users own each game
         game_owner_counts = {}
         for appid in all_games.keys():
             count = sum(
@@ -212,9 +233,11 @@ def load_common_games():
             if count >= min_owners:
                 game_info = all_games[appid].copy()
                 game_info["owner_count"] = count
+                game_info["owner_names"] = [
+                    user_details[uid] for uid in game_owners[appid]
+                ]
                 common_games.append(game_info)
 
-        # Sort by owner count (descending), then by name
         common_games.sort(key=lambda x: (-x["owner_count"], x.get("name", "").lower()))
 
         return str(common_games_list(common_games, total_users))

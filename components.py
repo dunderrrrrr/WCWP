@@ -163,6 +163,25 @@ def base_layout(content, container_width="800px"):
                 .htmx-indicator {{
                     display: none;
                 }}
+                .game-item {{
+                    transition: all 0.3s;
+                    cursor: pointer;
+                }}
+                .game-item:hover {{
+                    background: #2c313c;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                }}
+                .owner-names {{
+                    opacity: 0;
+                    max-height: 0;
+                    overflow: hidden;
+                    transition: all 0.3s ease-in-out;
+                }}
+                .game-item:hover .owner-names {{
+                    opacity: 1 !important;
+                    max-height: 100px !important;
+                }}
             """
             ],
         ],
@@ -204,14 +223,14 @@ def friends_list_page(friends):
         h.div(
             ".friend-item",
             **{
-                ":class": f"{{'selected': selectedFriends.includes('{friend["player"]['steamid']}')}}"
+                ":class": f"{{'selected': selectedFriends.includes('{friend['player']['steamid']}')}}"
             },
             **{
                 "@click": f"""
                 (() => {{
-                    const steamid = '{friend["player"]['steamid']}';
+                    const steamid = '{friend["player"]["steamid"]}';
                     const index = selectedFriends.indexOf(steamid);
-                    const checkbox = document.getElementById('checkbox-{friend["player"]['steamid']}');
+                    const checkbox = document.getElementById('checkbox-{friend["player"]["steamid"]}');
                     if (index === -1) {{
                         selectedFriends.push(steamid);
                         if (checkbox) checkbox.checked = true;
@@ -241,7 +260,7 @@ def friends_list_page(friends):
             h.div(".checkbox-icon")[
                 h.span(
                     **{
-                        "x-show": f"selectedFriends.includes('{friend["player"]['steamid']}')"
+                        "x-show": f"selectedFriends.includes('{friend['player']['steamid']}')"
                     }
                 )["✓"]
             ],
@@ -303,11 +322,6 @@ def friends_list_page(friends):
     return content
 
 
-def friends_list_wrapper(friends):
-    """Wrapper that returns full page layout"""
-    return base_layout(friends_list_page(friends))
-
-
 def games_page(friend_steam_ids: list[str]) -> h.Element:
     friend_ids_param = ",".join(friend_steam_ids)
 
@@ -345,38 +359,52 @@ def common_games_list(games_with_counts, total_users):
 
     game_items = [
         h.div(
-            style="display: flex; align-items: center; padding: 1rem; background: var(--pico-card-background-color); border-radius: 0.5rem; margin-bottom: 0.75rem;"
+            ".game-item",
+            style="display: flex; align-items: center; padding: 1rem; background: var(--pico-card-background-color); border-radius: 0.5rem; margin-bottom: 0.75rem; transition: all 0.3s; cursor: pointer;",
         )[
             (
                 h.img(
                     src=f"https://media.steampowered.com/steamcommunity/public/images/apps/{game.get('appid')}/{game.get('img_icon_url')}.jpg",
                     alt=game.get("name", "Unknown"),
-                    style="width: 48px; height: 48px; border-radius: 0.25rem; margin-right: 1rem;",
+                    style="width: 48px; height: 48px; border-radius: 0.25rem; margin-right: 1rem; flex-shrink: 0;",
                 )
                 if game.get("img_icon_url")
                 else h.div(
-                    style="width: 48px; height: 48px; border-radius: 0.25rem; margin-right: 1rem; background: var(--pico-muted-color);"
+                    style="width: 48px; height: 48px; border-radius: 0.25rem; margin-right: 1rem; background: var(--pico-muted-color); flex-shrink: 0;"
                 )
             ),
-            h.div(style="flex: 1;")[
-                h.div(style="font-weight: bold;")[game.get("name", "Unknown Game")],
+            h.div(style="flex: 1; min-width: 0;")[
+                h.div(style="font-weight: bold; margin-bottom: 0.25rem;")[
+                    game.get("name", "Unknown Game"),
+                ],
                 h.div(
-                    style="font-size: 0.875rem; color: var(--pico-muted-color)",
-                    title=", ".join(game.get("owner_names", [])),
+                    style="font-size: 0.875rem; color: var(--pico-muted-color); margin-bottom: 0.5rem;"
                 )[f"{game['owner_count']}/{total_users} people own this"],
+                h.div(
+                    ".owner-names",
+                    style="display: flex; gap: 0.375rem; flex-wrap: wrap; opacity: 0; max-height: 0; overflow: hidden; transition: all 0.3s ease-in-out;",
+                )[
+                    (
+                        h.span(
+                            style="font-size: 0.7rem; padding: 0.25rem 0.625rem; background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%); border: 1px solid rgba(102, 126, 234, 0.5); border-radius: 1rem; color: rgba(255, 255, 255, 0.9); white-space: nowrap;"
+                        )[name]
+                        for name in game["owner_names"]
+                    )
+                ],
             ],
             h.div(
                 style=f"""
                     width: 48px;
                     height: 48px;
                     border-radius: 50%;
-                    background: {'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' if game['owner_count'] == total_users else 'rgba(255, 255, 255, 0.1)'};
+                    background: {"linear-gradient(135deg, #667eea 0%, #764ba2 100%)" if game["owner_count"] == total_users else "rgba(255, 255, 255, 0.1)"};
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     font-weight: bold;
                     font-size: 0.875rem;
-                    color: {'white' if game['owner_count'] == total_users else 'rgba(255, 255, 255, 0.6)'};
+                    color: {"white" if game["owner_count"] == total_users else "rgba(255, 255, 255, 0.6)"};
+                    flex-shrink: 0;
                 """
             )[f"{int(game['owner_count'] / total_users * 100)}%"],
         ]
@@ -388,9 +416,61 @@ def common_games_list(games_with_counts, total_users):
             f"Found {len(games_with_counts)} game{'' if len(games_with_counts) == 1 else 's'}! 🎮"
         ],
         h.p(style="color: var(--pico-muted-color); margin-bottom: 1rem;")[
-            "Games ranked by how many people own them"
+            "Games ranked by how many people own them (hover to see who)"
         ],
         h.div(style="max-height: 400px; overflow-y: auto; margin-top: 1rem;")[
             game_items
         ],
+    ]
+
+
+def private_profile_message() -> h.Element:
+    """Message shown when user's profile is private"""
+    return h.div(style="text-align: center; padding: 3rem 2rem;")[
+        h.div(style="font-size: 4rem; margin-bottom: 1rem;")["🔒"],
+        h.h2(style="margin-bottom: 1rem;")["Your Profile is Private"],
+        h.p(
+            style="color: var(--pico-muted-color); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;"
+        )[
+            "To use this app, you need to set your Steam profile to public so we can see your friends list and games."
+        ],
+        h.div(
+            style="background: var(--pico-card-background-color); padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 2rem;"
+        )[
+            h.h3(style="font-size: 1rem; margin-bottom: 1rem;")[
+                "How to make your profile public:"
+            ],
+            h.ol(
+                style="text-align: left; padding-left: 1.5rem; color: var(--pico-muted-color);"
+            )[
+                h.li(style="margin-bottom: 0.5rem;")[
+                    "Go to your ",
+                    h.a(
+                        href="https://steamcommunity.com/my/edit/settings",
+                        target="_blank",
+                        style="color: var(--pico-primary);",
+                    )["Steam Privacy Settings"],
+                ],
+                h.li(style="margin-bottom: 0.5rem;")[
+                    'Set "My profile" to ', h.strong["Public"]
+                ],
+                h.li(style="margin-bottom: 0.5rem;")[
+                    'Set "Game details" to ', h.strong["Public"]
+                ],
+                h.li(style="margin-bottom: 0.5rem;")[
+                    'Set "Friends list" to ', h.strong["Public"]
+                ],
+                h.li["Click 'Save' and reload this page"],
+            ],
+        ],
+        h.button(
+            onclick="window.location.reload();",
+            style="margin-top: 1rem; margin-right: 1rem;",
+        )["Try again"],
+        h.a(
+            ".secondary",
+            href=url_for("logout"),
+            role="button",
+            style="margin-top: 1rem;",
+        )["Logout"],
     ]
