@@ -356,8 +356,120 @@ h1 {
 }
 
 .next-btn {
+    --mouse-x: 50%;
+    --mouse-y: 50%;
     width: 100%;
     margin-top: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 8px 20px rgba(102, 126, 234, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -2px 8px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.next-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.next-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        circle at var(--mouse-x) var(--mouse-y),
+        rgba(255, 255, 255, 0.2) 0%,
+        transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.next-btn:hover {
+    background: linear-gradient(135deg, #7c8ef5 0%, #8a5bb8 100%);
+    box-shadow:
+        0 12px 30px rgba(102, 126, 234, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -2px 12px rgba(0, 0, 0, 0.15),
+        0 0 0 2px rgba(255, 255, 255, 0.2),
+        0 0 30px rgba(102, 126, 234, 0.4);
+    transform: translateY(-2px) scale(1.01);
+}
+
+.next-btn:hover::before {
+    left: 100%;
+}
+
+.next-btn:hover::after {
+    opacity: 1;
+}
+
+.next-btn:active {
+    transform: translateY(0) scale(0.99);
+    box-shadow:
+        0 5px 15px rgba(102, 126, 234, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        inset 0 -2px 8px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.next-btn:disabled {
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+    transform: none;
+}
+
+.next-btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.next-btn:disabled::before,
+.next-btn:disabled::after {
+    display: none;
+}
+
+.next-btn span {
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease;
+}
+
+.next-btn:hover span {
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    letter-spacing: 1px;
 }
 
 .selected-count {
@@ -483,7 +595,18 @@ h1 {
 .save-group-btn {
     margin-bottom: 1rem;
     padding: 0.5rem 1rem;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
+    background: transparent;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 400;
+    transition: all 0.3s ease;
+}
+
+.save-group-btn:hover {
+    background: rgba(102, 126, 234, 0.1);
+    border-color: rgba(102, 126, 234, 0.5);
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .save-group-form {
@@ -500,6 +623,30 @@ h1 {
 .save-group-form button {
     margin: 0;
     white-space: nowrap;
+    background: transparent;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 400;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.save-group-form button:hover {
+    background: rgba(102, 126, 234, 0.1);
+    border-color: rgba(102, 126, 234, 0.5);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.save-group-form button.secondary {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.save-group-form button.secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.7);
 }
 
 /* Additional component styles */
@@ -573,6 +720,19 @@ h1 {
 .logout-button {
     margin-top: 1rem;
     width: 100%;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+    font-size: 0.875rem;
+    padding: 0.6rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .game-list {
@@ -736,4 +896,17 @@ h1 {
 
 .logout-button--secondary {
     margin-top: 1rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+    font-size: 0.875rem;
+    padding: 0.6rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.logout-button--secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.7);
 }

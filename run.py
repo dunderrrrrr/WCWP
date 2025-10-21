@@ -141,7 +141,11 @@ def load_friends():
         cache.delete_memoized(get_steam_friends, steam_id)
         return str(private_profile_message())
 
-    return str(friends_list_page(friends))
+    # Get user's own details for display
+    user_details = steam.users.get_user_details(steam_id)
+    user_name = user_details["player"]["personaname"]
+
+    return str(friends_list_page(friends, user_name))
 
 
 @app.route("/login")

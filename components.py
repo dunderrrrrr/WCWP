@@ -92,7 +92,7 @@ def loading_spinner(message="Loading..."):
     ]
 
 
-def friends_list_page(friends):
+def friends_list_page(friends, user_name=None):
     friend_items = [
         h.div(
             ".friend-item",
@@ -310,7 +310,20 @@ def friends_list_page(friends):
                 h.button(
                     ".next-btn",
                     type="submit",
-                    **{":disabled": "selectedCount === 0"},
+                    **{
+                        ":disabled": "selectedCount === 0",
+                        "onmousemove": """
+                            const rect = this.getBoundingClientRect();
+                            const x = ((event.clientX - rect.left) / rect.width) * 100;
+                            const y = ((event.clientY - rect.top) / rect.height) * 100;
+                            this.style.setProperty('--mouse-x', x + '%');
+                            this.style.setProperty('--mouse-y', y + '%');
+                        """,
+                        "onmouseleave": """
+                            this.style.setProperty('--mouse-x', '50%');
+                            this.style.setProperty('--mouse-y', '50%');
+                        """,
+                    },
                 )[
                     h.span["Find games →"],
                     h.span(
@@ -324,7 +337,7 @@ def friends_list_page(friends):
             ".secondary.logout-button",
             href=url_for("logout"),
             role="button",
-        )["Logout"],
+        )[f"Logout{f' ({user_name})' if user_name else ''}"],
     ]
 
     return content
