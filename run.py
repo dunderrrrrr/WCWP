@@ -25,6 +25,15 @@ sentry_sdk.init(dsn=os.getenv("SENTRY_DSN"), send_default_pii=True)
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
+
+# Configure filesystem cache
+cache_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".cache")
+os.makedirs(cache_dir, exist_ok=True)
+
+app.config["CACHE_TYPE"] = "FileSystemCache"
+app.config["CACHE_DIR"] = cache_dir
+app.config["CACHE_DEFAULT_TIMEOUT"] = 900
+
 cache = Cache(app)
 
 STEAM_API_KEY = os.getenv("STEAM_API_KEY")
