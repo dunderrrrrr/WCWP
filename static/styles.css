@@ -15,7 +15,7 @@ body {
 }
 
 .container--narrow {
-    max-width: 500px;
+    max-width: 700px;
 }
 
 main {
@@ -48,14 +48,14 @@ main {
 }
 
 .logo {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Outfit', sans-serif;
     font-size: 3.5rem;
-    font-weight: 700;
+    font-weight: 800;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    letter-spacing: 4px;
+    letter-spacing: -1px;
     line-height: 1;
     text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
 }
@@ -64,7 +64,7 @@ main {
     font-size: 1.25rem;
     font-weight: 300;
     color: rgba(255, 255, 255, 0.7);
-    letter-spacing: 1px;
+    letter-spacing: -1px;
     position: relative;
     padding-left: 1.5rem;
 }
@@ -92,7 +92,7 @@ h1 {
 
     .logo {
         font-size: 2.75rem;
-        letter-spacing: 3px;
+        letter-spacing: -0.5px;
     }
 
     .slogan {
@@ -107,21 +107,187 @@ h1 {
 }
 
 .steam-btn {
-    background-color: #171a21;
+    --mouse-x: 50%;
+    --mouse-y: 50%;
+    background:
+        linear-gradient(135deg, #1a1f2e 0%, #0f1419 100%),
+        radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(102, 126, 234, 0.15), transparent 60%);
+    background-blend-mode: normal, screen;
     width: 100%;
-    padding: 1rem;
+    padding: 1.5rem 2.5rem;
     border: none;
-    border-radius: 0.5rem;
+    border-radius: 1rem;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
     cursor: pointer;
     text-decoration: none;
-    display: block;
-    text-align: center;
-    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -2px 10px rgba(0, 0, 0, 0.3),
+        0 0 0 2px rgba(102, 126, 234, 0.2),
+        0 0 20px rgba(102, 126, 234, 0.1);
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    animation: button-pulse 3s ease-in-out infinite;
+}
+
+@keyframes button-pulse {
+    0%, 100% {
+        box-shadow:
+            0 10px 30px rgba(0, 0, 0, 0.5),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            inset 0 -2px 10px rgba(0, 0, 0, 0.3),
+            0 0 0 2px rgba(102, 126, 234, 0.2),
+            0 0 20px rgba(102, 126, 234, 0.1);
+    }
+    50% {
+        box-shadow:
+            0 10px 30px rgba(0, 0, 0, 0.5),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            inset 0 -2px 10px rgba(0, 0, 0, 0.3),
+            0 0 0 2px rgba(102, 126, 234, 0.3),
+            0 0 25px rgba(102, 126, 234, 0.15);
+    }
+}
+
+.steam-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.steam-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(
+            circle at var(--mouse-x) var(--mouse-y),
+            rgba(102, 126, 234, 0.3) 0%,
+            rgba(118, 75, 162, 0.2) 30%,
+            transparent 60%
+        );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.steam-btn:hover::before {
+    left: 100%;
+}
+
+.steam-btn:hover::after {
+    opacity: 1;
+}
+
+@keyframes rotate-gradient {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+    100% {
+        filter: hue-rotate(360deg);
+    }
 }
 
 .steam-btn:hover {
-    background-color: #2a475e;
+    background:
+        linear-gradient(135deg, #252d3f 0%, #1a1f2e 100%),
+        radial-gradient(circle at 50% 50%, rgba(102, 126, 234, 0.1), transparent 70%);
+    background-blend-mode: normal, screen;
+    box-shadow:
+        0 15px 40px rgba(102, 126, 234, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -2px 15px rgba(102, 126, 234, 0.2),
+        0 0 0 3px rgba(102, 126, 234, 0.6),
+        0 0 40px rgba(102, 126, 234, 0.3),
+        0 0 60px rgba(118, 75, 162, 0.2);
+    transform: translateY(-3px) scale(1.02);
+    animation: none;
+}
+
+.steam-btn:active {
+    transform: translateY(-1px) scale(1);
+    box-shadow:
+        0 8px 25px rgba(102, 126, 234, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -2px 10px rgba(102, 126, 234, 0.1),
+        0 0 0 2px rgba(102, 126, 234, 0.5),
+        0 0 30px rgba(102, 126, 234, 0.2);
+}
+
+.steam-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    color: #ffffff;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+    transition: all 0.4s ease;
+    animation: icon-float 3s ease-in-out infinite;
+}
+
+@keyframes icon-float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-2px);
+    }
+}
+
+.steam-btn:hover .steam-icon {
+    filter:
+        drop-shadow(0 0 20px rgba(102, 126, 234, 0.8))
+        drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+    transform: rotate(-5deg) scale(1.15);
+    animation: icon-spin 0.6s ease-in-out;
+}
+
+@keyframes icon-spin {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+    50% {
+        transform: rotate(-180deg) scale(1.2);
+    }
+    100% {
+        transform: rotate(-360deg) scale(1.15);
+    }
+}
+
+.steam-btn span {
+    position: relative;
+    z-index: 1;
+    text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.5),
+        0 0 10px rgba(102, 126, 234, 0.2);
+    transition: all 0.4s ease;
+}
+
+.steam-btn:hover span {
+    text-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(102, 126, 234, 0.6),
+        0 0 30px rgba(118, 75, 162, 0.4);
+    letter-spacing: 1.5px;
 }
 
 .friends-list {
