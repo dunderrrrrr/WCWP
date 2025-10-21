@@ -1,0 +1,510 @@
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+    transition: max-width 0.3s;
+    height: 100%;
+}
+
+.container--narrow {
+    max-width: 500px;
+}
+
+main {
+    background: var(--pico-background-color);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.steam-btn {
+    background-color: #171a21;
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+.steam-btn:hover {
+    background-color: #2a475e;
+}
+
+.friends-list {
+    max-height: 400px;
+    position: relative;
+    overflow-y: auto;
+    margin: 0;
+}
+
+.friend-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: var(--pico-card-background-color);
+    border-radius: 0.5rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.friend-item:hover {
+    background: var(--pico-secondary-background);
+}
+
+.friend-item.selected {
+    border-color: var(--pico-primary);
+    background: var(--pico-primary-background);
+}
+
+.friend-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.5rem;
+    margin-right: 1rem;
+}
+
+.friend-info {
+    flex: 1;
+}
+
+.friend-name {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.friend-status {
+    font-size: 0.875rem;
+    color: var(--pico-muted-color);
+}
+
+.checkbox-icon {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--pico-muted-color);
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.friend-item.selected .checkbox-icon {
+    background: var(--pico-primary);
+    border-color: var(--pico-primary);
+}
+
+.next-btn {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.selected-count {
+    text-align: center;
+    color: var(--pico-muted-color);
+    margin-top: 1rem;
+}
+
+.search-bar {
+    margin-bottom: 1rem;
+    width: 100%;
+    position: relative;
+}
+
+.search-bar input {
+    margin-bottom: 0;
+    padding-right: 3rem;
+}
+
+.clear-search-btn {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--pico-muted-color);
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+    line-height: 1;
+    transition: color 0.3s;
+}
+
+.clear-search-btn:hover {
+    color: var(--pico-color);
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+}
+
+.spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--pico-primary);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.htmx-request .htmx-indicator {
+    display: inline-block;
+}
+
+.htmx-indicator {
+    display: none;
+}
+
+.game-item {
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.game-item:hover {
+    background: #2c313c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.owner-badges {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+}
+
+.game-list:hover .owner-badges {
+    opacity: 1 !important;
+    max-height: none !important;
+}
+
+.groups-section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--pico-card-background-color);
+    border-radius: 0.5rem;
+}
+
+.group-select-container {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.group-select-container select {
+    flex: 1;
+    margin: 0;
+}
+
+.group-select-container button {
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    background: transparent;
+    border: 1px solid var(--pico-del-color);
+    color: var(--pico-del-color);
+}
+
+.group-select-container button:hover {
+    background: var(--pico-del-color);
+    color: white;
+}
+
+.save-group-btn {
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.save-group-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.save-group-form input {
+    flex: 1;
+    margin: 0;
+}
+
+.save-group-form button {
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* Additional component styles */
+.intro-text {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.description-text {
+    color: var(--pico-muted-color);
+    margin-bottom: 1rem;
+}
+
+.section-title {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.search-save-container {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    align-items: stretch;
+}
+
+.search-save-container .search-bar {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.search-save-container .save-group-btn {
+    white-space: nowrap;
+    margin: 0;
+}
+
+.selected-count-link {
+    margin-left: 0.5rem;
+}
+
+.clear-selection-link {
+    color: var(--pico-primary);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.loading-message {
+    margin-top: 1rem;
+}
+
+.hidden-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.spinner--small {
+    width: 20px;
+    height: 20px;
+}
+
+.spinner-container {
+    margin-left: 0.5rem;
+}
+
+.back-button {
+    margin-top: 2rem;
+    width: 100%;
+}
+
+.logout-button {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.game-list {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: var(--pico-card-background-color);
+    border-radius: 0.5rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.game-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.25rem;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.game-icon--placeholder {
+    background: var(--pico-muted-color);
+}
+
+.game-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.game-name {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.game-owner-count {
+    font-size: 0.875rem;
+    color: var(--pico-muted-color);
+    margin-bottom: 0.5rem;
+}
+
+.owner-badges {
+    display: flex;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.owner-badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.625rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.5);
+    border-radius: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    white-space: nowrap;
+}
+
+.game-percentage {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.game-percentage--full {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.game-percentage--partial {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.games-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 1rem;
+}
+
+.no-games-message {
+    text-align: center;
+    padding: 2rem;
+}
+
+.no-games-subtitle {
+    color: var(--pico-muted-color);
+    margin-top: 0.5rem;
+}
+
+.games-header {
+    margin-top: 2rem;
+}
+
+.games-description {
+    color: var(--pico-muted-color);
+    margin-bottom: 1rem;
+}
+
+.private-profile-container {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.private-profile-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.private-profile-title {
+    margin-bottom: 1rem;
+}
+
+.private-profile-description {
+    color: var(--pico-muted-color);
+    margin-bottom: 2rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.private-profile-instructions {
+    background: var(--pico-card-background-color);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.private-profile-instructions h3 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.private-profile-list {
+    text-align: left;
+    padding-left: 1.5rem;
+    color: var(--pico-muted-color);
+}
+
+.private-profile-list li {
+    margin-bottom: 0.5rem;
+}
+
+.private-profile-link {
+    color: var(--pico-primary);
+}
+
+.retry-button {
+    margin-top: 1rem;
+    margin-right: 1rem;
+}
+
+.logout-button--secondary {
+    margin-top: 1rem;
+}
