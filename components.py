@@ -45,6 +45,17 @@ def base_layout(content, container_width="800px"):
     ]
 
 
+def load_friends_content() -> h.Element:
+    return h.div(
+        id="content-area",
+        **{
+            "hx-get": url_for("load_friends"),
+            "hx-trigger": "load",
+            "hx-swap": "innerHTML",
+        },
+    )[loading_spinner("Loading your friends...")]
+
+
 def login_page():
     return base_layout(
         h.div[
@@ -444,4 +455,10 @@ def private_profile_message() -> h.Element:
             href=url_for("logout"),
             role="button",
         )["Logout"],
+    ]
+
+
+def error_loading_games_warning() -> h.Element:
+    return h.div(style="text-align: center; padding: 2rem;")[
+        h.p["Error loading games. Please try again."],
     ]
