@@ -451,7 +451,8 @@ def common_games_list(games_with_counts, total_users, share_data_encoded=None):
                 ],
             ],
             h.div(
-                f".game-percentage.game-percentage--{'full' if game['owner_count'] == total_users else 'partial'}"
+                f".game-percentage.game-percentage--{'full' if game['owner_count'] == total_users else 'partial'}",
+                style=f"--percentage: {int(game['owner_count'] / total_users * 100)}",
             )[f"{int(game['owner_count'] / total_users * 100)}%"],
         ]
         for game in games_with_counts

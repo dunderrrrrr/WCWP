@@ -114,10 +114,18 @@ def load_common_games():
 
     share_data_encoded = request.args.get("share_data")
     steam_id = session.get("steam_id")
+
+    # When share_data is present, friend_ids already contains all users from the share link
+    # Add logged in user if they're viewing the shared link and logged in
     if share_data_encoded:
-        all_user_ids = [steam_id] + friend_ids if steam_id else friend_ids
+        # Shared link: add current user if logged in and not already in the list
+        if steam_id and steam_id not in friend_ids:
+            all_user_ids = [steam_id] + friend_ids
+        else:
+            all_user_ids = friend_ids
     else:
-        all_user_ids = friend_ids
+        # Normal flow: add current user to friend selection
+        all_user_ids = [steam_id] + friend_ids if steam_id else friend_ids
 
     try:
         total_users = len(all_user_ids)
@@ -145,7 +153,9 @@ def shared_games(data):
         content = h.div[
             h.div(
                 id="games-list",
-                hx_get=url_for("load_common_games", friend_ids=friend_ids_param),
+                hx_get=url_for(
+                    "load_common_games", friend_ids=friend_ids_param, share_data=data
+                ),
                 hx_trigger="load",
                 hx_swap="innerHTML",
             )[loading_spinner("Finding common games...")],
