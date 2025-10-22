@@ -112,10 +112,13 @@ def load_common_games():
 
     friend_ids = friend_ids_str.split(",")
 
-    steam_id = session.get("steam_id")
-    all_user_ids = [steam_id] + friend_ids if steam_id else friend_ids
-
     share_data_encoded = request.args.get("share_data")
+    steam_id = session.get("steam_id")
+    if share_data_encoded:
+        all_user_ids = [steam_id] + friend_ids if steam_id else friend_ids
+    else:
+        all_user_ids = friend_ids
+
     try:
         total_users = len(all_user_ids)
         common_games = steam_api.get_common_games(all_user_ids, total_users)
