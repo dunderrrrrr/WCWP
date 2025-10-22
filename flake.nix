@@ -17,7 +17,34 @@
         ...
       }: let
         python = pkgs.python3;
+
+        remoteProjectPath = "~/projects/wcwp";
+        remoteService = "wcwp.service";
+        healthCheckUrl = "https://wcwp.dunderrrrrr.se/status";
+
+        deployScript = pkgs.writeShellScriptBin "deploy" ''
+          ssh -t hetzner-vps "cd ${remoteProjectPath} && git pull && sudo systemctl restart ${remoteService}"
+
+          echo "Waiting for service to start..."
+          sleep 2
+
+          echo "Checking health endpoint..."
+          response=$(curl -s ${healthCheckUrl})
+          if [ "$response" = "ok" ]; then
+            echo "✓ Deployment successful! Service is healthy."
+          else
+            echo "✗ Health check failed! Expected 'ok', got: $response"
+            exit 1
+          fi
+        '';
       in {
+        packages.deploy = deployScript;
+
+        apps.deploy = {
+          type = "app";
+          program = "${deployScript}/bin/deploy";
+        };
+
         devShells.default = pkgs.mkShell {
           packages = [
             pkgs.uv
@@ -25,7 +52,8 @@
             python
             (pkgs.writeShellScriptBin "run-server" ''
               python run.py
-            '')             
+            '')
+            deployScript
           ];
           shellHook = ''
             uv venv

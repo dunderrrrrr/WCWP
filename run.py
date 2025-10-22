@@ -153,5 +153,10 @@ def shared_games(data):
         return str(base_layout(invalid_share_link_warning()))
 
 
+@app.route("/status")
+def status():
+    return "ok"
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
