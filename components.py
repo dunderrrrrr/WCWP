@@ -437,7 +437,12 @@ def common_games_list(games_with_counts, total_users, share_data_encoded=None):
                 else h.div(".game-icon.game-icon--placeholder")
             ),
             h.div(".game-info")[
-                h.div(".game-name")[game.get("name", "Unknown Game"),],
+                h.a(
+                    ".game-name",
+                    href=f"https://store.steampowered.com/app/{game.get('appid')}/",
+                    target="_blank",
+                    rel="noopener noreferrer",
+                )[game.get("name", "Unknown Game")],
                 h.div(".game-owner-count")[
                     f"{game['owner_count']}/{total_users} people own this"
                 ],
