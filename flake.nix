@@ -56,7 +56,7 @@
             deployScript
           ];
           shellHook = ''
-            uv venv
+            uv venv --clear
             source .venv/bin/activate
             uv pip sync requirements.txt
             pre-commit install --overwrite
