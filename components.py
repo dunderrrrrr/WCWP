@@ -175,6 +175,8 @@ def friends_list_page(friends, user_name=None):
                                 steamIds: [...this.selectedFriends]
                             });
                             localStorage.setItem('friendGroups', JSON.stringify(this.groups));
+                            this.selectedGroupIndex = this.groups.length - 1;
+                            this.loadedGroupFriends = [...this.selectedFriends];
                             this.newGroupName = '';
                             this.showSaveForm = false;
                         }
@@ -184,10 +186,15 @@ def friends_list_page(friends, user_name=None):
                             const steamIds = this.groups[this.selectedGroupIndex].steamIds;
                             this.selectedFriends = [...steamIds];
                             this.loadedGroupFriends = [...steamIds];
+                            document.querySelectorAll('input[name=selected_friends]').forEach(cb => cb.checked = false);
                             this.selectedFriends.forEach(steamid => {
                                 const checkbox = document.getElementById('checkbox-' + steamid);
                                 if (checkbox) checkbox.checked = true;
                             });
+                        } else {
+                            this.selectedFriends = [];
+                            this.loadedGroupFriends = [];
+                            document.querySelectorAll('input[name=selected_friends]').forEach(cb => cb.checked = false);
                         }
                     },
                     deleteGroup() {
@@ -195,6 +202,9 @@ def friends_list_page(friends, user_name=None):
                             this.groups.splice(this.selectedGroupIndex, 1);
                             localStorage.setItem('friendGroups', JSON.stringify(this.groups));
                             this.selectedGroupIndex = '';
+                            this.selectedFriends = [];
+                            this.loadedGroupFriends = [];
+                            document.querySelectorAll('input[name=selected_friends]').forEach(cb => cb.checked = false);
                         }
                     }
                 }"""
@@ -224,7 +234,7 @@ def friends_list_page(friends, user_name=None):
                         type="button",
                         **{
                             "@click": "deleteGroup()",
-                            ":disabled": "selectedGroupIndex === ''",
+                            "x-show": "selectedGroupIndex !== ''",
                             "title": "Delete selected group",
                         },
                     )["Delete"],
