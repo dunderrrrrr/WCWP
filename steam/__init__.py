@@ -2,8 +2,11 @@ import os
 import re
 
 import httpx
+from dotenv import load_dotenv
 from flask import request, url_for
 from steam_web_api import Steam  # type: ignore[import-untyped]
+
+load_dotenv()
 
 STEAM_OPENID_URL = "https://steamcommunity.com/openid/login"
 STEAM_API_URL = "http://api.steampowered.com/ISteamUser"
