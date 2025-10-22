@@ -1103,3 +1103,71 @@ h1 {
     border-color: rgba(255, 255, 255, 0.25);
     color: rgba(255, 255, 255, 0.7);
 }
+
+.button-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    align-items: center;
+}
+
+@media (max-width: 600px) {
+    .button-row {
+        flex-direction: column;
+    }
+
+    .button-row .back-button,
+    .button-row .share-button-container {
+        margin: 0;
+        width: 100%;
+    }
+}
+
+.share-button-container {
+    flex: 1;
+}
+
+.share-btn {
+    margin: 0;
+    padding: 0.6rem 1rem;
+    width: 100%;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+    border: 2px solid rgba(102, 126, 234, 0.5);
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
+}
+
+.share-btn:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+    border-color: rgba(102, 126, 234, 0.8);
+    color: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 25px rgba(102, 126, 234, 0.4);
+    transform: translateY(-1px);
+}
+
+.error-container {
+    text-align: center;
+}
+
+.error-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.error-title {
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.error-description {
+    color: var(--pico-muted-color);
+    margin-bottom: 2rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}

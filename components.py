@@ -1,3 +1,6 @@
+import base64
+import json
+
 import htpy as h
 from flask import url_for
 
@@ -355,13 +358,52 @@ def friends_list_page(friends, user_name=None):
     return content
 
 
-def games_page(friend_steam_ids: list[str]) -> h.Element:
+def share_button(all_user_ids: list[str]) -> h.Element:
+    share_data = {"friend_ids": all_user_ids}
+    json_str = json.dumps(share_data)
+    encoded = base64.urlsafe_b64encode(json_str.encode()).decode()
+
+    share_url_js = f"window.location.origin + '/shared/{encoded}'"
+
+    return h.div(".share-button-container", **{"x-data": "{copied: false}"})[
+        h.button(
+            ".share-btn.secondary",
+            type="button",
+            **{
+                "@click": f"""
+                const url = {share_url_js};
+                navigator.clipboard.writeText(url).then(() => {{
+                    copied = true;
+                    setTimeout(() => {{ copied = false; }}, 2000);
+                }});
+                """
+            },
+        )[
+            h.span(**{"x-show": "!copied"})["Copy link"],
+            h.span(**{"x-show": "copied"})["✓ Copied!"],
+        ]
+    ]
+
+
+def games_page(
+    friend_steam_ids: list[str], all_user_ids: list[str] | None = None
+) -> h.Element:
     friend_ids_param = ",".join(friend_steam_ids)
+    if all_user_ids is None:
+        all_user_ids = friend_steam_ids
+
+    share_data = {"friend_ids": all_user_ids}
+    json_str = json.dumps(share_data)
+    all_user_ids_encoded = base64.urlsafe_b64encode(json_str.encode()).decode()
 
     content = h.div[
         h.div(
             id="games-list",
-            hx_get=url_for("load_common_games", friend_ids=friend_ids_param),
+            hx_get=url_for(
+                "load_common_games",
+                friend_ids=friend_ids_param,
+                share_data=all_user_ids_encoded,
+            ),
             hx_trigger="load",
             hx_swap="innerHTML",
         )[loading_spinner("Finding common games...")],
@@ -376,7 +418,7 @@ def games_page(friend_steam_ids: list[str]) -> h.Element:
     return content
 
 
-def common_games_list(games_with_counts, total_users):
+def common_games_list(games_with_counts, total_users, share_data_encoded=None):
     if not games_with_counts:
         return h.div(".no-games-message")[
             h.p["No common games found. 😢"],
@@ -410,6 +452,17 @@ def common_games_list(games_with_counts, total_users):
         for game in games_with_counts
     ]
 
+    share_button_element = None
+    if share_data_encoded:
+        try:
+            decoded_bytes = base64.urlsafe_b64decode(share_data_encoded)
+            share_data = json.loads(decoded_bytes)
+            all_user_ids = share_data.get("friend_ids", [])
+            if all_user_ids:
+                share_button_element = share_button(all_user_ids)
+        except Exception:
+            pass
+
     return h.div(**{"x-data": "{ showOwners: false }"})[
         h.h3(".games-header")[
             f"Found {len(games_with_counts)} game{'' if len(games_with_counts) == 1 else 's'}!"
@@ -429,6 +482,11 @@ def common_games_list(games_with_counts, total_users):
             ],
         ],
         h.div(".games-container")[game_items],
+        (
+            h.div(".button-row", style="margin-top: 1.5rem;")[share_button_element]
+            if share_button_element
+            else None
+        ),
     ]
 
 
@@ -471,4 +529,15 @@ def private_profile_message() -> h.Element:
 def error_loading_games_warning() -> h.Element:
     return h.div(style="text-align: center; padding: 2rem;")[
         h.p["Error loading games. Please try again."],
+    ]
+
+
+def invalid_share_link_warning() -> h.Element:
+    return h.div(".error-container")[
+        h.div(".error-icon")["🔗"],
+        h.h2(".error-title")["Invalid link"],
+        h.p(".error-description")[
+            "This link appears to be corrupted or invalid. "
+            "Please ask for a new share link."
+        ],
     ]

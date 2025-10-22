@@ -1,3 +1,5 @@
+import base64
+import json
 import logging
 import os
 
@@ -14,7 +16,9 @@ from components import (
     error_loading_games_warning,
     friends_list_page,
     games_page,
+    invalid_share_link_warning,
     load_friends_content,
+    loading_spinner,
     login_page,
     private_profile_message,
 )
@@ -95,7 +99,9 @@ def logout():
 @app.route("/select-games", methods=["POST"])
 def select_games():
     selected_friends = request.form.getlist("selected_friends")
-    return str(games_page(selected_friends))
+    steam_id = session.get("steam_id")
+    all_ids = [steam_id] + selected_friends if steam_id else selected_friends
+    return str(games_page(selected_friends, all_ids))
 
 
 @app.route("/load-common-games")
@@ -107,17 +113,44 @@ def load_common_games():
     friend_ids = friend_ids_str.split(",")
 
     steam_id = session.get("steam_id")
-    if not steam_id:
-        return redirect(url_for("index"))
+    all_user_ids = [steam_id] + friend_ids if steam_id else friend_ids
 
+    share_data_encoded = request.args.get("share_data")
     try:
-        all_user_ids = [steam_id] + friend_ids
         total_users = len(all_user_ids)
         common_games = steam_api.get_common_games(all_user_ids, total_users)
-        return str(common_games_list(common_games, total_users))
+        return str(common_games_list(common_games, total_users, share_data_encoded))
     except Exception as e:
-        logging.error("Error fetching common games", exception=str(e))
+        logging.error("Error fetching common games", extra={"exception": str(e)})
         return str(error_loading_games_warning())
+
+
+@app.route("/shared/<data>")
+def shared_games(data):
+    """Display shared games from base64-encoded JSON data."""
+    try:
+        decoded_bytes = base64.urlsafe_b64decode(data)
+        shared_data = json.loads(decoded_bytes)
+
+        friend_ids = shared_data.get("friend_ids", [])
+        if not friend_ids:
+            logging.error("Error decoding shared link", extra={"data": data})
+            return str(base_layout(invalid_share_link_warning()))
+
+        friend_ids_param = ",".join(friend_ids)
+
+        content = h.div[
+            h.div(
+                id="games-list",
+                hx_get=url_for("load_common_games", friend_ids=friend_ids_param),
+                hx_trigger="load",
+                hx_swap="innerHTML",
+            )[loading_spinner("Finding common games...")],
+        ]
+        return str(base_layout(content))
+    except Exception as _:
+        logging.error("Error decoding shared link", extra={"data": data})
+        return str(base_layout(invalid_share_link_warning()))
 
 
 if __name__ == "__main__":
