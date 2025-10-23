@@ -446,6 +446,7 @@ def common_games_list(games_with_counts, total_users, share_data_encoded=None):
                 h.div(".game-owner-count")[
                     f"{game['owner_count']}/{total_users} people own this"
                 ],
+                h.p[game["price"]],
                 h.div(".owner-badges", **{"x-show": "showOwners"})[
                     (h.span(".owner-badge")[name] for name in game["owner_names"])
                 ],

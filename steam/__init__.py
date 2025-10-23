@@ -79,6 +79,14 @@ def get_owned_games(user_id: str) -> dict:
     return steam.users.get_owned_games(user_id)
 
 
+def get_price(app_id: str) -> str | None:
+    try:
+        data = steam.apps.get_app_details(app_id, filters="price_overview")[str(app_id)]
+        return data["data"]["price_overview"]["final_formatted"]
+    except Exception:
+        return None
+
+
 def get_common_games(all_user_ids, total_users):
     user_details = {}
     for user_id in all_user_ids:
@@ -122,6 +130,7 @@ def get_common_games(all_user_ids, total_users):
             game_info = all_games[appid].copy()
             game_info["owner_count"] = count
             game_info["owner_names"] = [user_details[uid] for uid in game_owners[appid]]
+            game_info["price"] = get_price(appid)
             common_games.append(game_info)
 
     return sorted(
