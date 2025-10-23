@@ -404,7 +404,7 @@ main {
 
 .search-bar input {
     width: 100%;
-    padding: 0.875rem 3rem 0.875rem 2.75rem;
+    padding: 0 3rem 0 2.75rem;
     background: var(--card-bg);
     border: 2px solid var(--glass-border);
     border-radius: var(--radius-sm);
@@ -412,6 +412,9 @@ main {
     font-size: 0.938rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     margin: 0;
+    height: calc(0.875rem * 2 + 1em + 4px);
+    line-height: 1em;
+    box-sizing: border-box;
 }
 
 .search-bar input::placeholder {

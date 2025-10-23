@@ -72,6 +72,26 @@ def load_friends():
     return str(friends_list_page(friends, user_name))
 
 
+@app.route("/refresh-friends")
+def refresh_friends():
+    steam_id = session.get("steam_id")
+    if not steam_id:
+        return redirect(url_for("index"))
+
+    cache.delete_memoized(get_steam_friends, steam_id)
+
+    # Return loading spinner that will trigger the actual load
+    return str(
+        h.div(
+            **{
+                "hx-get": url_for("load_friends"),
+                "hx-trigger": "load",
+                "hx-swap": "innerHTML",
+            }
+        )[loading_spinner("Refreshing friends list...")]
+    )
+
+
 @app.route("/login")
 def login():
     if "steam_id" in session:

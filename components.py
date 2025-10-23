@@ -302,26 +302,6 @@ def friends_list_page(friends, user_name=None):
                 hx_indicator="#submit-spinner",
             )[
                 h.div(".friends-list")[friend_items],
-                h.div(".selected-count")[
-                    h.span(
-                        **{
-                            "x-text": "selectedCount === 0 ? 'No friends selected' : selectedCount === 1 ? '1 friend selected' : selectedCount + ' friends selected'"
-                        }
-                    ),
-                    h.span(
-                        ".selected-count-link",
-                        **{"x-show": "selectedCount > 0"},
-                    )[
-                        h.a(
-                            ".clear-selection-link",
-                            href="#",
-                            **{
-                                "@click.prevent": """selectedFriends = [];
-                                document.querySelectorAll('input[name=selected_friends]').forEach(cb => cb.checked = false);"""
-                            },
-                        )["Clear selection"]
-                    ],
-                ],
                 h.button(
                     ".next-btn",
                     type="submit",
@@ -345,6 +325,34 @@ def friends_list_page(friends, user_name=None):
                         ".htmx-indicator.spinner-container",
                         id="submit-spinner",
                     )[h.div(".spinner.spinner--small")],
+                ],
+                h.div(".selected-count")[
+                    h.span(
+                        x_text="selectedCount === 0 ? 'No friends selected' : selectedCount === 1 ? '1 friend selected' : selectedCount + ' friends selected'"
+                    ),
+                    h.span(
+                        ".selected-count-link",
+                        **{"x-show": "selectedCount > 0"},
+                    )[
+                        h.a(
+                            ".clear-selection-link",
+                            href="#",
+                            **{
+                                "@click.prevent": """selectedFriends = [];
+                                document.querySelectorAll('input[name=selected_friends]').forEach(cb => cb.checked = false);"""
+                            },
+                        )["Clear selection"]
+                    ],
+                    h.span(".selected-count-link")[
+                        h.a(
+                            ".clear-selection-link",
+                            href="#",
+                            hx_get=url_for("refresh_friends"),
+                            hx_target="#content-area",
+                            hx_swap="innerHTML",
+                            title="Refresh friends list",
+                        )["Refresh friends list"]
+                    ],
                 ],
             ],
         ],
